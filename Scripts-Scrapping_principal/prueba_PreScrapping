@@ -1,4 +1,4 @@
-"""'
+"""
 Hay que ejecutar este ecript desde la carpeta donde queremos que se guarden los folder,
 es así como está configurado o especificarlo nosotros mismos.
 """
@@ -6,15 +6,15 @@ es así como está configurado o especificarlo nosotros mismos.
 import sys
 import pandas as pd
 
-sys.path.append("/Users/omarkhalil/Desktop/Universidad/IvanPhD")
+sys.path.append("/Users/omarkhalil/Desktop/Universidad/IvanPhD/Programacion")
 import ScrappingPrincipal.PreScrapping as ejemplo
 
 df = pd.read_excel(
-    "/Users/omarkhalil/Desktop/Universidad/IvanPhD/Cualitativo/ArchivosDrive/Catalogo_Tripadvisor2.xlsx",
+    "/Users/omarkhalil/Desktop/Universidad/IvanPhD/Programacion/ArchivosDrive/Catalogo_Tripadvisor2.xlsx",
     header=0,
     engine="openpyxl",
 )
 objeto = ejemplo.PreScrapping(
     df,
-    directory="/Users/omarkhalil/Desktop/Universidad/IvanPhD/Scripts-Scrapping_principal",
+    directory="/Users/omarkhalil/Desktop/Universidad/IvanPhD/Programacion/Scripts-Scrapping_principal",
 )

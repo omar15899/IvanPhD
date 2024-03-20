@@ -1,15 +1,17 @@
-'''
+"""
 Este módulo sirve para generar todos los mapas con etiquetas diferentes. 
 Este módulo se completará una vez hallamos generado el scrapping y por ahora
-solo vamos a hacer una serie 
-'''
+solo vamos a hacer una serie de características sencillitas. Cuando se haga 
+el scrapping se comprobará el overall de todo esto. 
+"""
+
 import pandas as pd
 import folium
 from .prescrapping import *
 
 
 class Mapping(PreScrapping):
-    def __init__(self, df: pd.DataFrame, directory: str = ...) -> None:
+    def __init__(self, df: pd.DataFrame, directory: str = os.getcwd()) -> None:
         super().__init__(df, directory)
 
     def mapa_etiquetas(self):

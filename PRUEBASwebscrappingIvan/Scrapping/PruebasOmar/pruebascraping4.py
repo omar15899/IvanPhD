@@ -20,8 +20,8 @@ PAYLOAD = [
             "client": "ar",
             "dataStrategy": "ar",
             "filter": {"mediaGroup": "ALL_INCLUDING_RESTRICTED"},
-            "offset": 0,
-            "limit": 20,
+            "offset": 23000,
+            "limit": 10,
         },
         "extensions": {"preRegisteredQueryId": "2d46abde60a014b0"},
     }
@@ -45,24 +45,23 @@ headers = {
 }
 
 
-offset = 0
-lista_total = []  # Lista para acumular los resultados
-
+offset = PAYLOAD[0]["variables"]["offset"]
+lista_total = []  # Lista para acumular los resultados de cada extracción
+cont = 0
 while True:
+    cont += 1
     time.sleep(2)
-    PAYLOAD[0]["variables"]["offset"] = offset
     try:
         response = session.post(DATA_URL, headers=headers, json=PAYLOAD).json()
-        lista_total.append(
-            response
-        )  # Asume que quieres guardar la respuesta en la lista
-        print(response)  # Imprimir la respuesta o procesarla como necesites
+        lista_total.append(response)
+        print(response)
     except:
         continue
 
-    offset += 40
-    if offset > 20000:  # Condición de salida modificable según la lógica deseada
+    offset += PAYLOAD[0]["variables"]["limit"]
+    if cont > 2:  # Condición de salida modificable según la lógica deseada
         break
+
 
 # Serializar y guardar la lista total en un archivo
 with open("lista_total.pkl", "wb") as f:

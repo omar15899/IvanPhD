@@ -141,6 +141,11 @@ class PreScrapping:
             elem = elem.replace("Cta.", "Cuesta")
             elem = elem.replace("Ct.", "Cuesta")
 
+            # Limpiamos todas las tildes de las ubicaciones con translate para
+            # hacerlo más elegantte:
+            mapeo = str.maketrans("áéíóúÁÉÍÓÚ", "aeiouAEIOU")
+            elem = elem.translate(mapeo)
+
             return elem
 
         # --------------------------------------------------------------------------------------- Limpieza de datos básica
@@ -152,14 +157,10 @@ class PreScrapping:
 
         # Reemplaza cualquier símbolo especial por '_'
         # Nota: '[^\w\s]' selecciona cualquier carácter que no sea alfanumérico o espacio en blanco
-        df["ElementoModificado"] = df["Elemento"].apply(
-            lambda x: re.sub(r"[^\w\s]", "_", x)
-        )
+        df["Elemento1"] = df["Elemento"].apply(lambda x: re.sub(r"[^\w\s]", "_", x))
 
         # Eliminamos de la columna Elemento los espacios:
-        df["ElementoModificado"] = df["ElementoModificado"].apply(
-            lambda x: x.replace(" ", "_")
-        )
+        df["Elemento1"] = df["Elemento1"].apply(lambda x: x.replace(" ", "_"))
 
         # Ordenamos el dataframe en base al número que ocupa en el ranking de tripadvisor:
         df = df.sort_values(by=["Ranking"], ascending=True)
