@@ -21,9 +21,18 @@ class Scrapping(Mapping):
     @staticmethod
     def tratamiento_post_scrapping():
         """
-        Una vez tenemos las listas, se genera un procesamiento de cada uno de los archivos
+        Una vez tenemos las listas cuyos elementos son json con los datos de cada una
+        de las requests mandadas, se genera un procesamiento de cada uno de los archivos
         para tener un único json con toda la información de cada una de las imágenes.
         """
+        
+        '''
+        Pasos:
+        1. Crear un programita para ir descargando todas las imágenes e ir descargándolas
+        en sus respectivas carpetas. Tienen que tener como metadato su mediaId que encontramos
+        en el JSON de extracciones.
+        2. 
+        '''
 
         pass
 
@@ -35,7 +44,11 @@ class Scrapping(Mapping):
         subprocess.run(["brew", "services", "start", "tor"], check=True)
 
     @staticmethod
-    def scrapping(row: pd.Series | dict) -> None:
+    def scrapping(
+        row: pd.Series | dict,
+        nombre_carpeta: str,
+        nombre_directorio: str = os.path.dirname(__file__)
+        ) -> None:
         """'
         Función que hace el request a la API de tripadvisor para obtener
         todos los valores e ir devolviendolos en la lista. El formato de
@@ -56,7 +69,7 @@ class Scrapping(Mapping):
         #     list(row.keys())
 
         # Extraemos info importante de las columnas:
-        name_folder = row["Elemento1"]
+        name_fichero = row["Elemento1"] + ".pkl"
         n_fotos = row["Nº fotos"]
         enlace = row["Enlace"]
         # Expresión regular para encontrar el patrón '-d' seguido de uno o más dígitos
@@ -117,9 +130,15 @@ class Scrapping(Mapping):
         lista_total = []  # Lista para acumular los resultados de cada extracción
         contador_errores_request = 0
 
-        # UTILIZAMOS _CREAR_CARPETA_EN_UBICACIÓN PARA HACER LAS COSAS BIEN Y QUE SE SOBREESCRIBAN LAS CARPETAS.
-
-        f = open(n_fotos + ".pkl", "wb")
+        # Creamos un folder con el nombre si no existe y un archivo vacío, reescribimos
+        # el name_fichero con la enumeración pertinente que esté habilitada en ese folder:
+        name_fichero = Scrapping._crear_carpeta_archivo_en_ubicacion_script(
+            nombre_carpeta= nombre_carpeta,
+            nombre_directorio= nombre_directorio,
+            nombre_archivo = name_fichero,
+        )
+        # Abrimos el archivo (no lo creamos porque ya se ha creado en la función previa)
+        f = open(name_fichero, "wb")
         while True:
             time.sleep(2 * random.random())
             try:
@@ -134,7 +153,7 @@ class Scrapping(Mapping):
             offset += PAYLOAD[0]["variables"]["limit"]
             if (
                 offset > n_fotos
-            ):  # Condición de salida modificable según la lógica deseada
+            ): 
                 break
         f.close()
         print(
@@ -156,13 +175,17 @@ class Scrapping(Mapping):
         # Recorremos todos los enlaces de la lista recorriendo toda la lista y aplicamos
         # la función de scrapping:
         for index, row in df.iterrows():
+            # Reiniciamos tor para cada scrapping, esto facilitará las cosas para que no rastreen
             Scrapping.restart_tor()
             time.sleep(10)
+            # Salvo error, se generarán todos los scrappings pertinentes.
             try:
-                Scrapping.scrapping(row)
+                Scrapping.scrapping(
+                    row = row,
+                    nombre_carpeta='Fichero_Scrapping',
+                    nombre_directorio= self.directory
+                    )
             except:
                 lista_errores_scrapping.append(row["Elemento1"])
                 print(f'Error en elemento {row['Elemento1']}')
                 continue
-
-        

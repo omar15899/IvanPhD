@@ -9,6 +9,7 @@ import os
 import inspect
 import re
 import pandas as pd
+from typing import List
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 
@@ -16,14 +17,20 @@ from geopy.extra.rate_limiter import RateLimiter
 class PreScrapping:
     def __init__(self, df: pd.DataFrame, directory: str = os.getcwd()) -> None:
         """
-        directory es opcional, sirve para indicar dónde queremos que se generen
-        las carpetas. En caso de que no escribamos nada las carpetas se generaran
-        en el directorio desde donde se esté ejecutando el terminal.
+        La variable directory es opcional, sirve para indicar dónde queremos que
+        se generen las carpetas. En caso de que no escribamos nada las carpetas
+        se generaran en el directorio desde donde se esté ejecutando el terminal.
+
+        Se recomienta que directory se ponga de forma manual para hacer la instalación
+        pertinente de los ficheros.
+
+        La variable df puede ser la variable df en crudo que ha diseñado Iván o
+        el df ya tratado (que haya pasado por _preparacion_datos y geocodificator).
+
+        Todo se almacena en df por no enrevesar las cosas. No necesitamos mucho más.
         """
         self.df = df
         self.directory = directory
-        self.df_prepared = self._preparacion_datos()
-        self.df_coordenadas = None
 
     # --------------------------------------------------------------------------------------- Métodos para crear archivos
     """
@@ -31,9 +38,6 @@ class PreScrapping:
     scrapping puesto que estamos sistematizando una forma de crear archivos y carpetas en la 
     ubicación del script que nos va a permitir generar todas las carpetas que nos den la gana
     de una forma fácil y sencilla.
-
-    ATENCIÓN: CONTENIDO_ARCHIVO PUEDE SER UN STR POR LOS JSON EN EL SCRAPPING. CONSTRUIRÉ ESA
-    PARTE DEL CÓDIGO MÁS ADELANTE.
     """
 
     @staticmethod
@@ -59,8 +63,8 @@ class PreScrapping:
         nombre_carpeta: str,
         nombre_directorio: str = os.path.dirname(__file__),
         nombre_archivo: str | None = None,
-        contenido_archivo: str | pd.DataFrame | None = None,
-    ) -> None:
+        contenido_archivo: str | List | pd.DataFrame | None = None,
+    ) -> str | None:
         """
         Busca una carpeta en el directorio donde se está ejecutando el script
         con nombre nombre_carpeta y si no la encuentra crea una. Si nombre_archivo
@@ -91,26 +95,37 @@ class PreScrapping:
                 )
                 contador += 1
 
-            # Si es un xlsx, directamente generamos el df
-            if extension == ".xlsx":
+            # Si es un archivo importable desde pandas, directamente generamos el df
+            if extension == ".xlsx" and isinstance(contenido_archivo, pd.DataFrame):
                 contenido_archivo.to_excel(ruta_archivo)
-            elif extension == ".csv":
+            elif extension == ".csv" and isinstance(contenido_archivo, pd.DataFrame):
                 contenido_archivo.to_csv(ruta_archivo, index=False)
-            elif extension == ".json":
+            elif extension == ".json" and isinstance(contenido_archivo, pd.DataFrame):
                 contenido_archivo.to_json(ruta_archivo, orient="records", lines=True)
-            elif extension == ".pkl":
+            elif extension == ".pkl" and isinstance(contenido_archivo, pd.DataFrame):
                 contenido_archivo.to_pickle(ruta_archivo)
-            else:
-                # Si no, creamos el archivo (vacío) en la ruta final
+            elif not isinstance(contenido_archivo, pd.DataFrame):
+                # Si no es un df, creamos el archivo (vacío) en la ruta final para que
+                # solo tengamos que esribir el archivo desde fuera. La ventaja es  que
+                # estará en una carpeta y con un nombre a todas las versiones previas.
                 with open(ruta_archivo, "w") as archivo:
-                    pass  # No es necesario escribir nada en el archivo por ahora.
+                    pass
+                # En caso de que solo se cree devolvermos el nombre del archivo para
+                # poder escribirlo a continuación:
+                return ruta_archivo
 
     # --------------------------------------------------------------------------------------- Métodos para dfs:
-    def _preparacion_datos(self) -> pd.DataFrame:
+    def _preparacion_datos(self) -> None:
         """
         Función que solo trabaja con df en el formato que tiene Ivan ahora mismo, cualquier
         cambio tendría consecuencias graves.
+
+        Como le podemos pasar a esta función también un df que ya ha pasado por aquí,
+        si tiene la columna Elemento1 quiere decir que no necesita ningún tipo de tratamiento
+        de este tipo
         """
+        if "Elemento1" in self.df.columns.to_list():
+            return self.df
 
         # --------------------------------------------------------------------------------------- Funciones para apply
         # Generamos la función añadir a cada ubicación el Madrid, Spain:
@@ -121,7 +136,7 @@ class PreScrapping:
                 return pd.NA
 
         # Generamos la función corrección de formato para la columna Ubicación
-        def _corrector_formatos_direcciones(elem):
+        def _corrector_formatos_direcciones(elem: str) -> str:
             """
             Reemplaza abreviaturas comunes en direcciones con sus nombres completos.
 
@@ -149,38 +164,57 @@ class PreScrapping:
             return elem
 
         # --------------------------------------------------------------------------------------- Limpieza de datos básica
-        df = self.df
 
         # Eliminamos de la columna ranking el símobolo de posición:
-        if df["Ranking"][0][:-1] == "°":
-            df["Ranking"] = df["Ranking"].apply(lambda x: x[:-1])
+        if self.df["Ranking"][0][:-1] == "°":
+            self.df["Ranking"] = self.df["Ranking"].apply(lambda x: x[:-1])
 
         # Reemplaza cualquier símbolo especial por '_'
         # Nota: '[^\w\s]' selecciona cualquier carácter que no sea alfanumérico o espacio en blanco
-        df["Elemento1"] = df["Elemento"].apply(lambda x: re.sub(r"[^\w\s]", "_", x))
+        self.df["Elemento1"] = self.df["Elemento"].apply(
+            lambda x: re.sub(r"[^\w\s]", "_", x)
+        )
 
         # Eliminamos de la columna Elemento los espacios:
-        df["Elemento1"] = df["Elemento1"].apply(lambda x: x.replace(" ", "_"))
+        self.df["Elemento1"] = self.df["Elemento1"].apply(lambda x: x.replace(" ", "_"))
+        self.df["Elemento1"] = self.df["Elemento1"].apply(
+            _corrector_formatos_direcciones
+        )
 
         # Ordenamos el dataframe en base al número que ocupa en el ranking de tripadvisor:
-        df = df.sort_values(by=["Ranking"], ascending=True)
-        df["Ubicación1"] = df["Ubicación"]
-        df["Ubicación"] = df["Ubicación"].apply(_anadir_ciudad)
-        df = df.loc[~pd.isna(df["Ubicación"]), :].copy()
-        df["Ubicación"] = df["Ubicación"].apply(_corrector_formatos_direcciones)
+        self.df = self.df.sort_values(by=["Ranking"], ascending=True)
+        self.df["Ubicación1"] = self.df["Ubicación"]
+        self.df["Ubicación"] = self.df["Ubicación"].apply(_anadir_ciudad)
+        self.df = self.df.loc[~pd.isna(self.df["Ubicación"]), :].copy()
+        self.df["Ubicación"] = self.df["Ubicación"].apply(
+            _corrector_formatos_direcciones
+        )
+
+        self.df.columns = [
+            "Elemento",
+            "Elemento1",
+            "Ubicación",
+            "Ubicació1",
+        ] + self.df.columns[2:]
 
         # --------------------------------------------------------------------------------------- Guardado en carpeta:
         PreScrapping._crear_carpeta_archivo_en_ubicacion_script(
             "Resultados_PreFiltering",
             nombre_directorio=self.directory,
             nombre_archivo="df_limpio.xlsx",
-            contenido_archivo=df,
+            contenido_archivo=self.df,
         )
 
-        return df
-
     # --------------------------------------------------------------------------------------- Geoanálisis
-    def geocodificator(self):
+    def geocodificator(self) -> pd.DataFrame:
+        """
+        Como le podemos pasar a esta función también un df que ya ha pasado por aquí,
+        si tiene la columna location quiere decir que no necesita ningún tipo de tratamiento.
+
+        """
+        if "location" in self.df.columns.to_list():
+            return
+
         # Inicializamos el geocodificador
         geolocator = Nominatim(
             user_agent="myGeocoder", timeout=10
@@ -188,30 +222,30 @@ class PreScrapping:
         geocode = RateLimiter(geolocator.geocode, min_delay_seconds=1)
 
         # Aplicamos la geocodificación a cada dirección
-        self.df["location"] = self.df_prepared["Ubicación"].apply(geocode)
+        self.df["location"] = self.df["Ubicación"].apply(geocode)
 
         # Extraemos latitud y longitud
-        self.df_prepared["lat"] = self.df_prepared["location"].apply(
+        self.df["lat"] = self.df["location"].apply(
             lambda loc: loc.latitude if loc else None
         )
-        self.df_prepared["lon"] = self.df_prepared["location"].apply(
+        self.df["lon"] = self.df["location"].apply(
             lambda loc: loc.longitude if loc else None
         )
-        self.df_prepared["Coordenadas"] = self.df_prepared[["lat", "lon"]].apply(
+        self.df["Coordenadas"] = self.df[["lat", "lon"]].apply(
             lambda row: (row[0], row[1]), axis=1
         )
 
-        # Guardamos los valores de la misma forma
+        # Guardamos los valores de la misma forma para no tener que volver a ejecutarlos
         PreScrapping._crear_carpeta_archivo_en_ubicacion_script(
             "Resultados_PreFiltering",
             nombre_directorio=self.directory,
             nombre_archivo="df_coordenadas.xlsx",
-            contenido_archivo=self.df_prepared,
+            contenido_archivo=self.df,
         )
 
         PreScrapping._crear_carpeta_archivo_en_ubicacion_script(
             "Resultados_PreFiltering",
             nombre_directorio=self.directory,
             nombre_archivo="df_coordenadas.pkl",
-            contenido_archivo=self.df_prepared,
+            contenido_archivo=self.df,
         )
