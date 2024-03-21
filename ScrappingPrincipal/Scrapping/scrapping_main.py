@@ -15,27 +15,15 @@ from PreScrapping import *
 
 
 class Scrapping(Mapping):
-    def __init__(self, df: pd.DataFrame, directory: str = os.getcwd()) -> None:
+    def __init__(self, df: pd.DataFrame, directory: str = os.getcwd(), name_folder_scrapping: str = 'Fichero_Scrapping') -> None:
+        '''
+        name_folder_scrapping me permite elegir el nombre del fichero de scrapping que vamos a 
+        querer utilizar. 
+        '''
         super().__init__(df, directory)
+        self.name_folder = name_folder_scrapping
 
-    @staticmethod
-    def tratamiento_post_scrapping():
-        """
-        Una vez tenemos las listas cuyos elementos son json con los datos de cada una
-        de las requests mandadas, se genera un procesamiento de cada uno de los archivos
-        para tener un único json con toda la información de cada una de las imágenes.
-        """
-        
-        '''
-        Pasos:
-        1. Crear un programita para ir descargando todas las imágenes e ir descargándolas
-        en sus respectivas carpetas. Tienen que tener como metadato su mediaId que encontramos
-        en el JSON de extracciones.
-        2. 
-        '''
-
-        pass
-
+    
     @staticmethod
     def restart_tor():
         # Detenemos el servicio Tor
@@ -44,7 +32,7 @@ class Scrapping(Mapping):
         subprocess.run(["brew", "services", "start", "tor"], check=True)
 
     @staticmethod
-    def scrapping(
+    def scrapper(
         row: pd.Series | dict,
         nombre_carpeta: str,
         nombre_directorio: str = os.path.dirname(__file__)
@@ -55,6 +43,10 @@ class Scrapping(Mapping):
         entrada tiene que tener un Series con los indices de los elementos
         siendo las columnas del excel que ha hecho ivan en tripadvisor
         formateado o un diccionario con las mismas características.
+    
+        Esta función hará todo el trabajo importante relacionado con el scrapping,
+        hará todos los cálculos importantes y acto seguido pasará a guardarlos en
+        carpetas de un fichero en concreto.
         """
         # Comprobamos que efectivamente tenemos todas las columnas que necesitamos:
         columnas = ["Enlace", "Elemento1", "Nº fotos"]
@@ -159,17 +151,51 @@ class Scrapping(Mapping):
         print(
             f"Extracción realizada con éxito con {contador_errores_request} errores para {n_fotos}."
         )
+        
+    @staticmethod
+    def scrapper_downloader(file_path: str) -> None:
+        '''
+        Descarga todas las fotos sugeridas de las listas generadas en el scrapping.
+        '''
+        # Analiza todos los archivos de la carpeta de nombre name_folder y
+        # eliminamos aquel que sea el que informa de errores:
+        if file_path is 'monumentos_no_scrappeados.txt':
+            return
+        
+        # Abrimos el archivo para lectura en modo binario ('rb') (no lo leemos)
+        with open(file_path, 'rb') as archivo:
+            # Cargar el contenido del archivo pickle al objeto de Python
+            lista_elementos = pickle.load(archivo)
+        
+        # Trabajamos las listas de tal forma que descargemos los archivos y le 
+        # metamos como nombre del archivo el mediaId. Recordemos que estos pickle
+        # tienen listas de tuplas (json,num_fallido), donde cada json es un 
+        # request que se le ha hecho a la API de tal para tener un limit de 
+        # fotografías y num_fallido es el num de requests fallidos:
+        
+        for requesti in lista_elementos:
+            requesti = requesti[0]
+            for foto in requesti['mediaList']:
+                nombre_foto = str(foto['mediaId']) + file_path
+                
+                # seleccionamos la imagen de mayor tamano:
+                linkfoto = foto['photoSizes'][-1]['url']
+                
+                # Descargamos la foto y la guardamos en un archivo.jpg                      
+                
+
+                
+            
+            
 
     def scrap_everything(self):
-        """'
-        Esta función hará todo el trabajo importante relacionado con el scrapping,
-        hará todos los cálculos importantes y acto seguido pasará a guardarlos en
-        carpetas de un fichero en concreto.
-        """
-        df = self.df
+        ''' 
+        Función que realiza el scrapping sobre todos los elementos del fichero. Cuando salgamos de este
+        fichero vamos a tener gran parte del trabajo hecho. 
+        '''
 
         # Limpiamos todos los monumentos que no tengan links definidos
-        df = df[~pd.isna(df["Enlace"])]
+        df = self.df[~pd.isna(df["Enlace"])]
 
         lista_errores_scrapping = []
         # Recorremos todos los enlaces de la lista recorriendo toda la lista y aplicamos
@@ -180,12 +206,48 @@ class Scrapping(Mapping):
             time.sleep(10)
             # Salvo error, se generarán todos los scrappings pertinentes.
             try:
-                Scrapping.scrapping(
+                Scrapping.scrapper(
                     row = row,
-                    nombre_carpeta='Fichero_Scrapping',
+                    nombre_carpeta=self.name_folder,
                     nombre_directorio= self.directory
                     )
             except:
                 lista_errores_scrapping.append(row["Elemento1"])
                 print(f'Error en elemento {row['Elemento1']}')
                 continue
+            
+        # Creamos un archivo para guardar los elementos que no se han scrappeado bien:
+        texto = '\n'.join(lista_errores_scrapping)
+        ruta_archivo = Scrapping._crear_carpeta_archivo_en_ubicacion_script(
+            nombre_carpeta=self.name_folder,
+            nombre_directorio= self.directory,
+            nombre_archivo='monumentos_no_scrappeados.txt',
+        )
+        with open(ruta_archivo, 'w') as stream:
+            stream.write(texto)
+            
+    def tratamiento_post_scrapping(self):
+        """
+        Una vez tenemos las listas cuyos elementos son json con los datos de cada una
+        de las requests mandadas, se genera un procesamiento de cada uno de los archivos
+        para tener un único json con toda la información de cada una de las imágenes.
+        """
+        
+        '''
+        Pasos:
+        1. Crear un programita para ir descargando todas las imágenes e ir descargándolas
+        en sus respectivas carpetas. Tienen que tener como metadato su mediaId que encontramos
+        en el JSON de extracciones.
+        2. 
+        '''
+        # Buscamos los documentos con las listas completas de los responses en el directorio
+        # mediante sus rutas relativas al folder en el que se encuentran.
+        lista_archivos = os.listdir(self.directory + self.name_folder)
+        
+        for archivo in lista_archivos:
+            Scrapping.scrapper_downloader(archivo)
+        
+
+        pass
+        
+         
