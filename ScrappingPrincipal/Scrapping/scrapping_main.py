@@ -71,11 +71,11 @@ class Scrapping(Mapping):
         enlace = row["Enlace"]
         # Expresión regular para encontrar el patrón '-d' seguido de uno o más dígitos
         patron = r"-d(\d+)"
-        # Buscar el patrón en la URL
+        # Buscamos el patrón en la URL
         resultado = re.search(patron, enlace)
         if not resultado:
             raise Exception("No se ha encontrado el locationid en el enlace")
-        locationid = resultado.group(1)
+        locationid = int(resultado.group(1))
         # El locationid se obiene siempre del link y va después del -d primero que encuentre
 
         # Configuramos la sesión de requests para utilizar el proxy de Tor
@@ -141,7 +141,7 @@ class Scrapping(Mapping):
             try:
                 response = session.post(DATA_URL, headers=headers, json=PAYLOAD).json()
                 lista_total.append(response[0])
-                # Serializar y guardar la lista total en un archivo con el conteo de errores
+                # Serializamos y guardar la lista total en un archivo con el conteo de errores
                 pickle.dump((lista_total, contador_errores_request), f)
             except:
                 contador_errores_request += 1
