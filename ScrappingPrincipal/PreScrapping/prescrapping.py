@@ -3,6 +3,11 @@ El objetivo de este script es dejar un dataset con toda la información util con
 basarnos para enviar el prompt. Una vez enviemos el prompt, en otro script generaremos un dataset
 con todas las imágenes y cada una de las imágenes tendrá ademaás todas estas columnas de este 
 dataset (se vinculará en base al http del que fueron descargadas).
+
+Lo interesante de esta clase es que servirá a modo de superclase para el resto del código. Se 
+ha construido de tal forma que los dos métodos principales (_preparación_datos y geocodificador)
+no se ejecuten si ya hemos metido un df con las columnas de geolocalización y las columnas
+trabajadas. De este modo será un algoritmo eficiente en cierto modo. 
 """
 
 import os
@@ -31,6 +36,8 @@ class PreScrapping:
         """
         self.df = df
         self.directory = directory
+        # Inicializamos la función principal
+        self._preparacion_datos()
 
     # --------------------------------------------------------------------------------------- Métodos para crear archivos
     """
@@ -190,12 +197,15 @@ class PreScrapping:
             _corrector_formatos_direcciones
         )
 
-        self.df.columns = [
-            "Elemento",
-            "Elemento1",
-            "Ubicación",
-            "Ubicació1",
-        ] + self.df.columns[2:]
+        self.df = self.df[
+            [
+                "Elemento",
+                "Elemento1",
+                "Ubicación",
+                "Ubicación1",
+            ]
+            + self.df.columns.to_list()[2:-2]
+        ]
 
         # --------------------------------------------------------------------------------------- Guardado en carpeta:
         PreScrapping._crear_carpeta_archivo_en_ubicacion_script(

@@ -8,8 +8,13 @@ import pandas as pd
 
 # Hacemos una importación relativa, primero volvemos hacia
 # atrás y después importamos todo de la carpeta PreScrapping
-from .. import PreScrapping
-from PreScrapping import *
+# from .. import PreScrapping
+# from PreScrapping import *
+
+# Como el script que utilice esta librería va a tener si o si 
+# en el path el directorio principal de todos, podemos hacer
+# una importación absoluta:
+from ScrappingPrincipal.PreScrapping import *
 
 # otra forma sería from PreScrapping.mapping import * o alguna de las variantes
 
@@ -149,7 +154,7 @@ class Scrapping(Mapping):
                 break
         f.close()
         print(
-            f"Extracción realizada con éxito con {contador_errores_request} errores para {n_fotos}."
+            f"Extracción realizada con éxito con {contador_errores_request} errores para {name_fichero}."
         )
         
     @staticmethod
@@ -159,7 +164,7 @@ class Scrapping(Mapping):
         '''
         # Analiza todos los archivos de la carpeta de nombre name_folder y
         # eliminamos aquel que sea el que informa de errores:
-        if file_path is 'monumentos_no_scrappeados.txt':
+        if file_path == 'monumentos_no_scrappeados.txt':
             return
         
         # Abrimos el archivo para lectura en modo binario ('rb') (no lo leemos)
@@ -184,10 +189,6 @@ class Scrapping(Mapping):
                 # Descargamos la foto y la guardamos en un archivo.jpg                      
                 
 
-                
-            
-            
-
     def scrap_everything(self):
         ''' 
         Función que realiza el scrapping sobre todos los elementos del fichero. Cuando salgamos de este
@@ -195,7 +196,10 @@ class Scrapping(Mapping):
         '''
 
         # Limpiamos todos los monumentos que no tengan links definidos
-        df = self.df[~pd.isna(df["Enlace"])]
+        df = self.df[~pd.isna(self.df["Enlace"])]
+
+        # Para pruebas seleccionamos 3 valores:
+        df = df.sort_values(by=["Nº fotos"], ascending=True).iloc[:3, :]
 
         lista_errores_scrapping = []
         # Recorremos todos los enlaces de la lista recorriendo toda la lista y aplicamos
