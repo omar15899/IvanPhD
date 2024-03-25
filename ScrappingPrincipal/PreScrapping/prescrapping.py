@@ -20,7 +20,12 @@ from geopy.extra.rate_limiter import RateLimiter
 
 
 class PreScrapping:
-    def __init__(self, df: pd.DataFrame, directory: str = os.getcwd()) -> None:
+    def __init__(
+        self,
+        df: pd.DataFrame,
+        directory: str = os.getcwd(),
+        name_folder: str = "Fichero_PreScrapping",
+    ) -> None:
         """
         La variable directory es opcional, sirve para indicar dónde queremos que
         se generen las carpetas. En caso de que no escribamos nada las carpetas
@@ -36,6 +41,7 @@ class PreScrapping:
         """
         self.df = df
         self.directory = directory
+        self.name_folder = name_folder
         # Inicializamos la función principal
         self._preparacion_datos()
 
@@ -209,7 +215,7 @@ class PreScrapping:
 
         # --------------------------------------------------------------------------------------- Guardado en carpeta:
         PreScrapping._crear_carpeta_archivo_en_ubicacion_script(
-            "Resultados_PreFiltering",
+            self.name_folder,
             nombre_directorio=self.directory,
             nombre_archivo="df_limpio.xlsx",
             contenido_archivo=self.df,
@@ -247,14 +253,14 @@ class PreScrapping:
 
         # Guardamos los valores de la misma forma para no tener que volver a ejecutarlos
         PreScrapping._crear_carpeta_archivo_en_ubicacion_script(
-            "Resultados_PreFiltering",
+            self.name_folder,
             nombre_directorio=self.directory,
             nombre_archivo="df_coordenadas.xlsx",
             contenido_archivo=self.df,
         )
 
         PreScrapping._crear_carpeta_archivo_en_ubicacion_script(
-            "Resultados_PreFiltering",
+            self.name_folder,
             nombre_directorio=self.directory,
             nombre_archivo="df_coordenadas.pkl",
             contenido_archivo=self.df,

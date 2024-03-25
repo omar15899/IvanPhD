@@ -13,20 +13,21 @@ import pandas as pd
 
 # Como el script que utilice esta librería va a tener si o si 
 # en el path el directorio principal de todos, podemos hacer
-# una importación absoluta:
+# una importación absoluta, aunque esto va a impedir poder
+# ejecutar el código desde aquí si no anadimos al PATH la ubicación
+# de la librería ScrappingPrincipal:
 from ScrappingPrincipal.PreScrapping import *
 
 # otra forma sería from PreScrapping.mapping import * o alguna de las variantes
 
 
 class Scrapping(Mapping):
-    def __init__(self, df: pd.DataFrame, directory: str = os.getcwd(), name_folder_scrapping: str = 'Fichero_Scrapping') -> None:
+    def __init__(self, df: pd.DataFrame, directory: str = os.getcwd(), name_folder: str = 'Fichero_Scrapping') -> None:
         '''
         name_folder_scrapping me permite elegir el nombre del fichero de scrapping que vamos a 
         querer utilizar. 
         '''
-        super().__init__(df, directory)
-        self.name_folder = name_folder_scrapping
+        super().__init__(df, directory, name_folder)
 
     
     @staticmethod
@@ -197,16 +198,18 @@ class Scrapping(Mapping):
 
         # Limpiamos todos los monumentos que no tengan links definidos
         df = self.df[~pd.isna(self.df["Enlace"])]
+        df = df.sort_values(by=["Nº fotos"], ascending=False) 
+        # df = df.iloc[45:, :]
 
-        # Para pruebas seleccionamos 3 valores:
-        df = df.sort_values(by=["Nº fotos"], ascending=True).iloc[:3, :]
+        # # Para pruebas seleccionamos 3 valores:
+        # df = df.sort_values(by=["Nº fotos"], ascending=True).iloc[:3, :]
 
         lista_errores_scrapping = []
         # Recorremos todos los enlaces de la lista recorriendo toda la lista y aplicamos
         # la función de scrapping:
+        Scrapping.restart_tor()
         for index, row in df.iterrows():
             # Reiniciamos tor para cada scrapping, esto facilitará las cosas para que no rastreen
-            Scrapping.restart_tor()
             time.sleep(10)
             # Salvo error, se generarán todos los scrappings pertinentes.
             try:

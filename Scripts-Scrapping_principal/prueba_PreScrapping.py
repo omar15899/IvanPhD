@@ -21,6 +21,7 @@ df = pd.read_excel(
 
 objeto = sc.Scrapping(
     df,
-    directory="/Users/omarkhalil/Desktop/Universidad/IvanPhD/Programacion/Scripts-Scrapping_principal",
+    directory="/Users/omarkhalil/Desktop/Universidad/IvanPhD/Datos_Obtenidos",
+    name_folder="Fichero_Scrapping_2",
 )
 print(objeto.scrap_everything())

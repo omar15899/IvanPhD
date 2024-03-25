@@ -11,12 +11,17 @@ from .prescrapping import *
 
 
 class Mapping(PreScrapping):
-    def __init__(self, df: pd.DataFrame, directory: str = os.getcwd()) -> None:
+    def __init__(
+        self,
+        df: pd.DataFrame,
+        directory: str = os.getcwd(),
+        name_folder: str = "Fichero_Mapping",
+    ) -> None:
         """
         En este caso, a diferencia de la clase PreScrapping, el df se espera que sea
         el valor salida del geocodificator, porque tiene que tener las coordenadas.
         """
-        super().__init__(df, directory)
+        super().__init__(df, directory, name_folder)
 
     def mapa_etiquetas(self):
         df = df[~pd.isna(df["lat"]) & ~pd.isna(df["lon"])]
