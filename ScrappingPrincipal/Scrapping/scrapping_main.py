@@ -15,7 +15,8 @@ import pandas as pd
 # en el path el directorio principal de todos, podemos hacer
 # una importación absoluta, aunque esto va a impedir poder
 # ejecutar el código desde aquí si no anadimos al PATH la ubicación
-# de la librería ScrappingPrincipal:
+# de la librería ScrappingPrincipal. Pero es así como se escriben las liberías
+# profesionales:
 from ScrappingPrincipal.PreScrapping import *
 
 # otra forma sería from PreScrapping.mapping import * o alguna de las variantes
@@ -32,6 +33,9 @@ class Scrapping(Mapping):
     
     @staticmethod
     def restart_tor():
+        ''''
+        Función que reinicia tor desde el terminal de dispositivos IOS.
+        '''
         # Detenemos el servicio Tor
         subprocess.run(["brew", "services", "stop", "tor"], check=True)
         # Iniciamos el servicio Tor
@@ -43,7 +47,7 @@ class Scrapping(Mapping):
         nombre_carpeta: str,
         nombre_directorio: str = os.path.dirname(__file__)
         ) -> None:
-        """'
+        """
         Función que hace el request a la API de tripadvisor para obtener
         todos los valores e ir devolviendolos en la lista. El formato de
         entrada tiene que tener un Series con los indices de los elementos

@@ -121,6 +121,9 @@ class PreScrapping:
                 # Si no es un df, creamos el archivo (vacío) en la ruta final para que
                 # solo tengamos que esribir el archivo desde fuera. La ventaja es  que
                 # estará en una carpeta y con un nombre a todas las versiones previas.
+                # Además, como se ha usado el with open as, el archivo se cierra solo,
+                # si no lo tendríamos que explicitar en este código como archivo.close
+                # antes del pass.
                 with open(ruta_archivo, "w") as archivo:
                     pass
                 # En caso de que solo se cree devolvermos el nombre del archivo para
