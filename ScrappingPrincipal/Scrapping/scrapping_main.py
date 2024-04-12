@@ -23,7 +23,12 @@ from ScrappingPrincipal.PreScrapping import *
 
 
 class Scrapping(Mapping):
-    def __init__(self, df: pd.DataFrame, directory: str = os.getcwd(), name_folder: str = 'Fichero_Scrapping') -> None:
+    def __init__(
+            self, 
+            df: pd.DataFrame, 
+            directory: str = os.getcwd(), 
+            name_folder: str = 'Fichero_Scrapping'
+            ) -> None:
         '''
         name_folder_scrapping me permite elegir el nombre del fichero de scrapping que vamos a 
         querer utilizar. 
@@ -48,6 +53,25 @@ class Scrapping(Mapping):
         nombre_directorio: str = os.path.dirname(__file__)
         ) -> None:
         """
+        Realiza una solicitud a la API de TripAdvisor para obtener datos.
+
+        Esta función realiza el trabajo principal relacionado con el web scraping. 
+        Realiza cálculos importantes y luego guarda los resultados en carpetas de un archivo específico.
+
+        Args:
+            row (Union[pd.Series, dict]): Un pandas Series o un diccionario que contiene los datos a raspar.
+                Debe tener los índices de los elementos como las columnas del excel que ha hecho Ivan en TripAdvisor
+                formateado o un diccionario con las mismas características.
+            nombre_carpeta (str): El nombre de la carpeta donde se guardarán los datos raspados.
+            nombre_directorio (str, optional): La ruta del directorio donde se encuentra el archivo. 
+                Por defecto es el directorio del archivo actual.
+
+        Raises:
+            Exception: Si no se incluyen los parámetros mínimos para realizar el web scraping.
+
+        Returns:
+            None
+        
         Función que hace el request a la API de tripadvisor para obtener
         todos los valores e ir devolviendolos en la lista. El formato de
         entrada tiene que tener un Series con los indices de los elementos
@@ -166,6 +190,18 @@ class Scrapping(Mapping):
     def scrapper_downloader(file_path: str) -> None:
         '''
         Descarga todas las fotos sugeridas de las listas generadas en el scrapping.
+
+        Esta función analiza todos los archivos en la carpeta especificada y descarga todas las fotos sugeridas.
+        Ignora el archivo 'monumentos_no_scrappeados.txt'. Cada archivo se abre en modo de lectura binaria y se carga
+        el contenido del archivo pickle al objeto de Python. Luego, se procesan las listas para descargar los archivos
+        y se asigna el mediaId como el nombre del archivo.
+
+        Args:
+            file_path (str): La ruta del archivo que contiene las listas generadas en el scrapping.
+
+        Returns:
+            None
+
         '''
         # Analiza todos los archivos de la carpeta de nombre name_folder y
         # eliminamos aquel que sea el que informa de errores:
@@ -237,11 +273,15 @@ class Scrapping(Mapping):
         with open(ruta_archivo, 'w') as stream:
             stream.write(texto)
             
-    def tratamiento_post_scrapping(self):
+    def tratamiento_post_scrapping(
+            self, 
+            directory : str = None, 
+            name_folder: str = None 
+            ):
         """
         Una vez tenemos las listas cuyos elementos son json con los datos de cada una
         de las requests mandadas, se genera un procesamiento de cada uno de los archivos
-        para tener un único json con toda la información de cada una de las imágenes.
+        para tener un único jsons con toda la información de cada una de las imágenes.
         """
         
         '''
@@ -261,4 +301,4 @@ class Scrapping(Mapping):
 
         pass
         
-         
+

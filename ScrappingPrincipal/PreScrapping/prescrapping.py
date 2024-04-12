@@ -60,6 +60,10 @@ class PreScrapping:
         se encuentra ubicado. Para ello buscamos el frame o call stack de la
         función a la que está llamando dentro del script y de ahí substraemos
         la ubicación completa del script.
+
+        Returns:
+            str | None: La ruta del directorio del script que llama a esta función,
+            o None si no se puede determinar.
         """
         # Obtenemos el marco de llamada del antecesor del script actual:
         marco = inspect.currentframe()
@@ -68,8 +72,7 @@ class PreScrapping:
         # Obtenemos la ruta del directorio donde se encuentra el script:
         directorio_script = os.path.dirname(ruta_script)
 
-        # return directorio_script
-        return os.getcwd()
+        return directorio_script
 
     @staticmethod
     def _crear_carpeta_archivo_en_ubicacion_script(
@@ -79,6 +82,19 @@ class PreScrapping:
         contenido_archivo: str | List | pd.DataFrame | None = None,
     ) -> str | None:
         """
+        Args:
+            nombre_carpeta (str): El nombre de la carpeta a buscar o crear.
+            nombre_directorio (str, optional): El directorio base donde buscar o crear la carpeta.
+                Por defecto, es el directorio del archivo actual.
+            nombre_archivo (str | None, optional): El nombre del archivo a crear dentro de la carpeta.
+                Por defecto, no se crea ningún archivo.
+            contenido_archivo (str | List | pd.DataFrame | None, optional): El contenido del archivo a crear.
+                Puede ser una cadena de texto, una lista, un DataFrame de pandas o None.
+                Por defecto, no se crea ningún archivo.
+
+        Returns:
+            str | None: La ruta completa del archivo creado, si se creó un archivo. None en caso contrario.
+
         Busca una carpeta en el directorio donde se está ejecutando el script
         con nombre nombre_carpeta y si no la encuentra crea una. Si nombre_archivo
         es diferente a None creará un archivo además dentro de esa carpeta. Primero
@@ -133,12 +149,13 @@ class PreScrapping:
     # --------------------------------------------------------------------------------------- Métodos para dfs:
     def _preparacion_datos(self) -> None:
         """
-        Función que solo trabaja con df en el formato que tiene Ivan ahora mismo, cualquier
-        cambio tendría consecuencias graves.
+        Función que realiza la preparación de los datos en el formato actual del dataframe.
+        Realiza diferentes transformaciones y limpiezas en el dataframe.
 
-        Como le podemos pasar a esta función también un df que ya ha pasado por aquí,
-        si tiene la columna Elemento1 quiere decir que no necesita ningún tipo de tratamiento
-        de este tipo
+        Si la columna 'Elemento1' ya existe en el dataframe, no se realiza ninguna operación y se devuelve el dataframe sin cambios.
+
+        Returns:
+        None
         """
         if "Elemento1" in self.df.columns.to_list():
             return self.df
