@@ -1,0 +1,114 @@
+
+Contexto: Estoy llevando a cabo un estudio acerca de la percepción del paisaje histórico de Madrid mediante fotos de mis amigos y necesito que me analices esta imagen. Eres un experto en análisis de fotografías de tipo paisajisico y cultural. Sabiendo que la imagen ha sido tomada en {} y siguiendo tu criterio más objetivo, capaz y profesional, necesito que respondas a las siguientes preguntas: {
+    "Cual es la característica principal (solo elegir la más representativa) con la que categorizarías a la imagen": [
+        "Palacio",
+        "Edificio gubernamental",
+        "Fuente pública",
+        "Arco de triunfo",
+        "Puerta monumental",
+        "Iglesia",
+        "Varios edificios",
+        "Río",
+        "Bosque",
+        "Edificio residencial",
+        "Edificio singular",
+        "Rascacielos",
+        "Escalinata",
+        "Verja",
+        "Túnel",
+        "Puente",
+        "Carretera",
+        "Escultura",
+        "Pintura",
+        "Arte moderno",
+        "Cartela informativa",
+        "Selfie",
+        "Retrato a personas",
+        "Animales",
+        "Espectáculo",
+        "Evento social"
+    ],
+    "Siglo del elemento en base a tu conocimiento del monumento": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+    ],
+    "Atribuye un estilo arquitectónico/artístico al elemento principal": [
+        "Renacentista",
+        "Herreriano",
+        "Barroco",
+        "Neoclasicismo",
+        "Eclecticismo",
+        "Modernismo",
+        "Racionalismo",
+        "Art Deco",
+        "Contemporaneo-Vaguardista"
+    ],
+    "¿Qué elementos de la siguiente lista aparecen en la foto (pueden ser varios)?": [
+        "Agua",
+        "Animales",
+        "Arco",
+        "Columna",
+        "Cornisa",
+        "Cúpula",
+        "Pilar",
+        "Edificio",
+        "Escultura",
+        "Fachada",
+        "Infraestructura",
+        "Mobiliario Interior",
+        "Moldura",
+        "Persona",
+        "Pilastra",
+        "Puerta",
+        "Torre",
+        "Elemento vegetal",
+        "Ventana"
+    ],
+    "Si no, ¿cuántos elementos de la lista anterior aparecen?": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18"
+    ],
+    "¿Qué materiales de la siguiente lista aparecen en la foto?": [
+        "Piedra",
+        "Ladrillo",
+        "Metal",
+        "Cristal",
+        "Madera",
+        "Teja"
+    ],
+    "¿Es una foto tomada en el exterior?": [
+        "Sí",
+        "No"
+    ],
+    "Si es una foto tomada en el exterior, ¿está tomada durante el día?": [
+        "Sí",
+        "No",
+        "No se sabe"
+    ],
+    "Indica cuál es el rango de cada fotografía de entre las siguientes opciones": [
+        "Panorámica",
+        "Detalle"
+    ]
+}
+La respuesta ha de darse en el mismo formato JSON, pero los keys tienen que ser P1,P2,…,PN

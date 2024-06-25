@@ -202,6 +202,12 @@ class PreScrapping:
         if self.df["Ranking"][0][:-1] == "°":
             self.df["Ranking"] = self.df["Ranking"].apply(lambda x: x[:-1])
 
+        # Creamos una columna con el identificador LocationId de cada elemento en tripadvisor:
+        patron = r"-d(\d+)"
+        self.df["LocationId"] = self.df["Enlace"].apply(
+            lambda x: int(re.search(patron, x).group(1))
+        )
+
         # Reemplaza cualquier símbolo especial por '_'
         # Nota: '[^\w\s]' selecciona cualquier carácter que no sea alfanumérico o espacio en blanco
         self.df["Elemento1"] = self.df["Elemento"].apply(

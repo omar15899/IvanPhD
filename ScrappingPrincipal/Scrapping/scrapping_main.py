@@ -185,9 +185,63 @@ class Scrapping(Mapping):
         print(
             f"Extracción realizada con éxito con {contador_errores_request} errores para {name_fichero}."
         )
+
+    @staticmethod
+    def picture_downloader(link: str, ubicacion_final: str) -> None:
+        '''
+        Descarga la foto de un link en una ubicación final específica.
+        :param link: El enlace de la foto a descargar.
+        :param ubicacion_final: La ubicación final donde se guardará la foto descargada.
+        :return: None
+        '''
+        try:
+            response = requests.get(link, stream=True)
+            # stream=True permite descargar la imagen en bytes              
+            if response.status_code == 200:
+                with open(ubicacion_final, 'wb') as file:
+                    file.write(response.content)
+        except Exception as e:
+            print('No se ha podido descargar la imagen:', e)
+            
+    @staticmethod
+    def file_downloader_preparator(file_path : str) -> List:
+        '''
+        Función que prepara los archivos pkl generados en el scrapping para ser descargados.
+        Se queda con todos los media list y los aglutina en un única lista. 
+        '''
+        with open(file_path, 'rb') as stream:
+            data = stream.read()
+        
+        try:
+            data = pickle.loads(data)
+            # Generamos una lista donde van a estar todos los subdiccionarios de cada uno de los
+            # requests que encontramos en el key mediaList:
+            resultado_en_lista = []
+            for subrequest in data:
+                for photos in data['data']['mediaList']:
+                    if isinstance(photos, dict):
+                        resultado_en_lista.append(photos)
+        
+        # Conesto voy a crear otros ficheros pkl con unas listas mucho más bonitas ya. 
+                        
+                
+        except Exception as e:
+            print('No se ha podido realizar la descarga de:', data, ' debido al error', e)
+        
+            
+    @staticmethod
+    def folder_downloader(folder_path: str) -> None:
+        '''
+        Descarga las fotos sugeridas de una carpeta en concreto.
+        '''
+        # Lista de archivos en la carpeta que sean .pkl
+        lista_archivos = os.listdir(folder_path)
+        for archivo in lista_archivos:
+            if archivo.endswith('.pkl'):
+                
         
     @staticmethod
-    def scrapper_downloader(file_path: str) -> None:
+    def scrapper_downloader_v1(file_path: str) -> None:
         '''
         Descarga todas las fotos sugeridas de las listas generadas en el scrapping.
 
@@ -227,8 +281,11 @@ class Scrapping(Mapping):
                 # seleccionamos la imagen de mayor tamano:
                 linkfoto = foto['photoSizes'][-1]['url']
                 
-                # Descargamos la foto y la guardamos en un archivo.jpg                      
-                
+                # Descargamos la foto y la guardamos en un archivo.jpg
+   
+   
+
+        
 
     def scrap_everything(self):
         ''' 
@@ -273,7 +330,7 @@ class Scrapping(Mapping):
         with open(ruta_archivo, 'w') as stream:
             stream.write(texto)
             
-    def tratamiento_post_scrapping(
+    def tratamiento_post_scrapping_V1(
             self, 
             directory : str = None, 
             name_folder: str = None 
@@ -299,6 +356,29 @@ class Scrapping(Mapping):
             Scrapping.scrapper_downloader(archivo)
         
 
+        pass
+        
+
+    def tratamiento_post_scrapping_V2(
+            self, 
+            directory : str = None, 
+            name_folder: str = None 
+            ):
+        """
+        Una vez tenemos las listas cuyos elementos son json con los datos de cada una
+        de las requests mandadas, se genera un procesamiento de cada uno de los archivos
+        para tener un único jsons con toda la información de cada una de las imágenes
+        Pasos:
+        1. Creamos una función para descargar todas las imágenes en una carpeta concreta. 
+        """ 
+        
+        # Buscamos los documentos con las listas completas de los responses en el directorio
+        # mediante sus rutas relativas al folder en el que se encuentran.
+        lista_archivos = os.listdir(self.directory + self.name_folder)
+        
+        for archivo in lista_archivos:
+            Scrapping.scrapper_downloader(archivo)
+    
         pass
         
 
