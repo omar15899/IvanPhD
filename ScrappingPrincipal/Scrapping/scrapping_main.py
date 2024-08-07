@@ -4,6 +4,7 @@ import pickle
 import subprocess
 import requests
 import random
+import base64
 import pandas as pd
 
 # Hacemos una importación relativa, primero volvemos hacia
@@ -38,12 +39,10 @@ class Scrapping(Mapping):
     
     @staticmethod
     def restart_tor():
-        ''''
-        Función que reinicia tor desde el terminal de dispositivos IOS.
         '''
-        # Detenemos el servicio Tor
+        Función que reinicia el servicio Tor desde el terminal de dispositivos macOS.
+        '''
         subprocess.run(["brew", "services", "stop", "tor"], check=True)
-        # Iniciamos el servicio Tor
         subprocess.run(["brew", "services", "start", "tor"], check=True)
 
     @staticmethod
@@ -228,16 +227,29 @@ class Scrapping(Mapping):
         except Exception as e:
             print('No se ha podido realizar la descarga de:', data, ' debido al error', e)
         
-            
     @staticmethod
-    def folder_downloader(folder_path: str) -> None:
+    def photo_downloader(url: str) -> str:
+        """
+        Descarga una foto de una URL y la decodifica a un str base64.
+        """
+        # Descargamos la foto
+        response = requests.get(url)
+        # Decodificamos la foto a base64
+        return base64.b64encode(response.content).decode()
+    
+    @staticmethod
+    def folder_downloader(folder_path: str) -> List[str]:
         '''
-        Descarga las fotos sugeridas de una carpeta en concreto.
+        Descarga las fotos sugeridas de una carpeta en concreto y las guarda dentro de la estructura 
+        de ese mismo subjson que encontramos en el archivo Estructura_JSON_API.txt. Este método
+        se mete en una carpeta y va seleccionando todos los archivos que sean pkl. Una vez los selecciona
+        se mete dentro de ellos y va seleccionando las fotos que hay. Al
         '''
         # Lista de archivos en la carpeta que sean .pkl
         lista_archivos = os.listdir(folder_path)
         for archivo in lista_archivos:
             if archivo.endswith('.pkl'):
+                pass
                 
         
     @staticmethod
@@ -282,10 +294,6 @@ class Scrapping(Mapping):
                 linkfoto = foto['photoSizes'][-1]['url']
                 
                 # Descargamos la foto y la guardamos en un archivo.jpg
-   
-   
-
-        
 
     def scrap_everything(self):
         ''' 
@@ -361,8 +369,8 @@ class Scrapping(Mapping):
 
     def tratamiento_post_scrapping_V2(
             self, 
-            directory : str = None, 
-            name_folder: str = None 
+            directory : Optional[str] = None, 
+            name_folder: Optional[str] = None 
             ):
         """
         Una vez tenemos las listas cuyos elementos son json con los datos de cada una
@@ -378,7 +386,7 @@ class Scrapping(Mapping):
         
         for archivo in lista_archivos:
             Scrapping.scrapper_downloader(archivo)
-    
+            
         pass
         
 

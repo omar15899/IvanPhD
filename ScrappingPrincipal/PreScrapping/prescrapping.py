@@ -14,7 +14,7 @@ import os
 import inspect
 import re
 import pandas as pd
-from typing import List
+from typing import List, Optional
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 
@@ -78,8 +78,8 @@ class PreScrapping:
     def _crear_carpeta_archivo_en_ubicacion_script(
         nombre_carpeta: str,
         nombre_directorio: str = os.path.dirname(__file__),
-        nombre_archivo: str | None = None,
-        contenido_archivo: str | List | pd.DataFrame | None = None,
+        nombre_archivo: Optional[str] = None,
+        contenido_archivo: Optional[str | List | pd.DataFrame] = None,
     ) -> str | None:
         """
         Args:

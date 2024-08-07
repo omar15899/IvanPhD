@@ -1,3 +1,0 @@
-- Lo primero que hemos hecho ha sido en la ventana de Network de safari, hemos buscado los archivos XHR/FETCH para ver las solicitudes que se han hehco 
-al servidor. Acto seguido lo que hemos hecho ha sido abrir el Preview y hemos pulsado en la opción de request en los archivos (antes hee estudiado los
-headeres para estudiar si realmente estamos reciviendo un tipo json con los links. 
