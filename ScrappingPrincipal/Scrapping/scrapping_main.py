@@ -84,15 +84,6 @@ class Scrapping(Mapping):
         # Comprobamos que efectivamente tenemos todas las columnas que necesitamos:
         columnas = ["Enlace", "Elemento1", "Nº fotos"]
 
-        # if isinstance(row, pd.Series):
-        #     num_presentes = row.index.isin(columnas).sum()
-        #     if num_presentes < 3:
-        #         raise Exception(
-        #             "No se han incluido los parámetros mínimos para poder realizar el Scrapping."
-        #         )
-        # elif isinstance(row, dict):
-        #     list(row.keys())
-
         # Extraemos info importante de las columnas:
         name_fichero = row["Elemento1"] + ".pkl"
         n_fotos = row["Nº fotos"]
@@ -228,7 +219,7 @@ class Scrapping(Mapping):
             print('No se ha podido realizar la descarga de:', data, ' debido al error', e)
         
     @staticmethod
-    def photo_downloader(url: str) -> str:
+    def photo_b64downloader(url: str) -> str:
         """
         Descarga una foto de una URL y la decodifica a un str base64.
         """
@@ -237,20 +228,6 @@ class Scrapping(Mapping):
         # Decodificamos la foto a base64
         return base64.b64encode(response.content).decode()
     
-    @staticmethod
-    def folder_downloader(folder_path: str) -> List[str]:
-        '''
-        Descarga las fotos sugeridas de una carpeta en concreto y las guarda dentro de la estructura 
-        de ese mismo subjson que encontramos en el archivo Estructura_JSON_API.txt. Este método
-        se mete en una carpeta y va seleccionando todos los archivos que sean pkl. Una vez los selecciona
-        se mete dentro de ellos y va seleccionando las fotos que hay. Al
-        '''
-        # Lista de archivos en la carpeta que sean .pkl
-        lista_archivos = os.listdir(folder_path)
-        for archivo in lista_archivos:
-            if archivo.endswith('.pkl'):
-                pass
-                
         
     @staticmethod
     def scrapper_downloader_v1(file_path: str) -> None:
@@ -367,26 +344,4 @@ class Scrapping(Mapping):
         pass
         
 
-    def tratamiento_post_scrapping_V2(
-            self, 
-            directory : Optional[str] = None, 
-            name_folder: Optional[str] = None 
-            ):
-        """
-        Una vez tenemos las listas cuyos elementos son json con los datos de cada una
-        de las requests mandadas, se genera un procesamiento de cada uno de los archivos
-        para tener un único jsons con toda la información de cada una de las imágenes
-        Pasos:
-        1. Creamos una función para descargar todas las imágenes en una carpeta concreta. 
-        """ 
-        
-        # Buscamos los documentos con las listas completas de los responses en el directorio
-        # mediante sus rutas relativas al folder en el que se encuentran.
-        lista_archivos = os.listdir(self.directory + self.name_folder)
-        
-        for archivo in lista_archivos:
-            Scrapping.scrapper_downloader(archivo)
-            
-        pass
-        
 

@@ -5,16 +5,40 @@ cuando se almacenan en el pkl
 
 import os
 import pickle
+import json
 from typing import List, Dict, Tuple, Union, Optional
 
 
 def extractor(
     data: Union[List, Dict, Tuple],
-    result: List,
+    result: Optional[List] = None,
     iteration: int = 0,
-) -> None:
-    # Limitar la profundidad de iteración para evitar bucles infinitos
-    if iteration >= 15:
+    max_iterations: int = 5,
+) -> Optional[List]:
+    """
+    Función para hacer el análisis de datos pertinente, se ha añadido un parámetro
+    max_iterations para limitar la profundidad de iteración y evitar bucles infinitos.
+
+    Args:
+        data (Union[List, Dict, Tuple]): Datos a analizar.
+        result (Optional[List], optional): Lista donde se almacenan los resultados. Defaults to None.
+        iteration (int, optional): Profundidad de la iteración actual. Defaults to 0.
+        max_iterations (int, optional): Profundidad máxima de iteración. Defaults to 5.
+
+    Returns:
+        Optional[List]: Lista con los resultados obtenidos.
+
+    Esta función, en la primera llamada a la misma en la mayoría de los casos generará en su callframe
+    una variable propia que será la lista result. Después, esa lista se irá pasando por referencia al
+    resto de funciones en el call stack y las irán modificando de acuerdo a esa lógica.
+    """
+
+    if result is None:
+        result = []
+
+    # Limitar la profundidad de iteración para evitar bucles infinitos,
+    # cada usb
+    if iteration >= max_iterations:
         return
 
     # Si 'data' es una lista, iterar sobre cada elemento
@@ -46,27 +70,10 @@ def extractor(
             else:
                 extractor(value, result, iteration=iteration + 1)
 
-
-def extractor2(
-    data: List | Dict | Tuple,
-    result: Optional[List] = None,
-) -> None:
-    if result is None:
-        result = []
-    if isinstance(data, list):
-        for subrequest in data:
-            extractor(subrequest, result)
-    elif isinstance(data, tuple):
-        for item in data:
-            extractor(item, result)
-    elif isinstance(data, dict):
-        for key, value in data.items():
-            if key == "data" or key == "MediaAlbumPage":
-                extractor(value, result)
-            elif key == "mediaList":
-                result.extend(value)
-
-    return result
+    if iteration == 0:
+        # Solo en el primer callstack (primera llamada a la función)
+        # debemos generar el resultado como devolución, si no que devuelva None
+        return result
 
 
 pathname = (
@@ -103,10 +110,26 @@ y en base a ello se meta dentro, busque lo que necesitamos que es toda la inofra
 """
 
 # guardamos en un txt los datos del archivo Plaza_de_Oriente.pkl
-with open(os.path.join(pathname, "Plaza_de_Oriente.pkl"), "rb") as f:
+with open(os.path.join(pathname, "Parque_El_Retiro.pkl"), "rb") as f:
     data = pickle.load(f)
 
+    imagenes = extractor(data)
+    dict_imagenes = {f"im{i}": imagenes[i] for i in range(len(imagenes))}
+    print(len(imagenes))
     with open(
-        os.path.join("/Users/omarkhalil/Desktop", "Plaza_de_Oriente.txt"), "w"
+        os.path.join(
+            r"/Users/omarkhalil/Desktop/Universidad/IvanPhD/Datos_Obtenidos/",
+            "Plaza_de_Oriente.txt",
+        ),
+        "w",
     ) as f:
         f.write(str(data))
+
+    with open(
+        os.path.join(
+            r"/Users/omarkhalil/Desktop/Universidad/IvanPhD/Datos_Obtenidos/",
+            "Plaza_de_Oriente.json",
+        ),
+        "w",
+    ) as f:
+        json.dump(dict_imagenes, f)

@@ -1,0 +1,129 @@
+[
+    {
+        "variables": {
+            "locationId": 190146,
+            "albumId": -160,
+            "subAlbumId": -160,
+            "client": "ar",
+            "dataStrategy": "ar",
+            "filter": {
+                "mediaGroup": "ALL_INCLUDING_RESTRICTED"
+            },
+            "offset": 20,
+            "limit": 20
+        },
+        "extensions": {
+            "preRegisteredQueryId": "2d46abde60a014b0"
+        }
+    },
+    {
+        "variables": {
+            "request": {
+                "page": "Attraction_Review",
+                "event": "PAGEVIEW",
+                "pixelMetrics": [
+                    {
+                        "id": "249",
+                        "name": "GOOGLE_CONVERSION_LINKER",
+                        "status": "success",
+                        "executionTime": 33
+                    },
+                    {
+                        "id": "13",
+                        "name": "TAPS_GTM_MONITORING",
+                        "status": "success",
+                        "executionTime": 33
+                    },
+                    {
+                        "id": "227",
+                        "name": "CDP_VIATOR_GADS_PAGEVIEW",
+                        "status": "success",
+                        "executionTime": 432
+                    },
+                    {
+                        "id": "484",
+                        "name": "TRAQ_GOOGLE_PAGEVIEW",
+                        "status": "success",
+                        "executionTime": 431
+                    },
+                    {
+                        "id": "499",
+                        "name": "TRAQ_GOOGLE_ATTRACTIONS_DETAIL",
+                        "status": "success",
+                        "executionTime": 454
+                    },
+                    {
+                        "id": "78",
+                        "name": "TAPS_DV360_YOUTUBE_PAGEVIEW",
+                        "status": "success",
+                        "executionTime": 1
+                    },
+                    {
+                        "id": "80",
+                        "name": "TAPS_MADHIVE_PAGEVIEW",
+                        "status": "success",
+                        "executionTime": 1
+                    },
+                    {
+                        "id": "86",
+                        "name": "TAPS_LIVERAMP_ECST",
+                        "status": "success",
+                        "executionTime": 0
+                    },
+                    {
+                        "id": "90",
+                        "name": "TAPS_TIKTOK_BASE_CODE",
+                        "status": "success",
+                        "executionTime": 0
+                    },
+                    {
+                        "id": "91",
+                        "name": "TAPS_TIKTOK_VIEW_CONTENT",
+                        "status": "success",
+                        "executionTime": 30
+                    },
+                    {
+                        "id": "139",
+                        "name": "TAPS_PINTEREST_EVENT",
+                        "status": "success",
+                        "executionTime": 1
+                    },
+                    {
+                        "id": "171",
+                        "name": "TRAQ_FACEBOOK_PAGEVIEW_VIEWCONTENT",
+                        "status": "success",
+                        "executionTime": 0
+                    },
+                    {
+                        "id": "219",
+                        "name": "TAPS_COMSCORE_PIXEL",
+                        "status": "success",
+                        "executionTime": 0
+                    },
+                    {
+                        "id": "344",
+                        "name": "TRAQ_CLICKTRIPZ_EXP_AUDIENCE",
+                        "status": "success",
+                        "executionTime": 0
+                    },
+                    {
+                        "id": "367",
+                        "name": "CDP_VIATOR_META_PAGEVIEW",
+                        "status": "success",
+                        "executionTime": 1
+                    },
+                    {
+                        "id": "434",
+                        "name": "CDP_THEFORK_META_PAGEVIEW",
+                        "status": "success",
+                        "executionTime": 0
+                    }
+                ],
+                "consent": true
+            }
+        },
+        "extensions": {
+            "preRegisteredQueryId": "986742f2dd8b0ec8"
+        }
+    }
+]

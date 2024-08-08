@@ -6,6 +6,39 @@
     ],
     "launch": {
         "version": "0.2.0",
-        "configurations": []
+        "configurations": [
+            {
+                "name": "Python: Current File",
+                "type": "debugpy",
+                "request": "launch",
+                "program": "${file}",
+                "console": "integratedTerminal",
+                "justMyCode": false,
+                "env": {
+                    "PYTHONIOENCODING": "UTF-8",
+                    "PYTHONUNBUFFERED": "1"
+                },
+                "envFile": "${workspaceFolder}/.env",
+                "logToFile": true,
+                "showReturnValue": true,
+                "redirectOutput": true
+            },
+            {
+                "name": "Python: Attach",
+                "type": "debugpy",
+                "request": "attach",
+                "connect": {
+                    "host": "localhost",
+                    "port": 5678
+                },
+                "pathMappings": [
+                    {
+                        "localRoot": "${workspaceFolder}",
+                        "remoteRoot": "."
+                    }
+                ],
+                "justMyCode": false
+            }
+        ]
     }
 }
