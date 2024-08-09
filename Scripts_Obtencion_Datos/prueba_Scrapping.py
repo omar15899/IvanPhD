@@ -19,8 +19,13 @@ df = pd.read_excel(
     engine="openpyxl",
 )
 
+# ordenamos por Nº fotos:
+df = df.sort_values(by="Nº fotos", ascending=True)
+
 objeto = sc.Scrapping(
     df,
     directory="/Users/omarkhalil/Desktop/Universidad/IvanPhD/Datos_Obtenidos",
-    name_folder="Fichero_Scrapping_2",
+    name_folder="Fichero_Scrapping",
 )
+
+objeto.scrap_everything()

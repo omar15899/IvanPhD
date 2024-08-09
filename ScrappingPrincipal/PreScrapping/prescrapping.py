@@ -221,7 +221,7 @@ class PreScrapping:
         )
 
         # Ordenamos el dataframe en base al número que ocupa en el ranking de tripadvisor:
-        self.df = self.df.sort_values(by=["Ranking"], ascending=True)
+        # self.df = self.df.sort_values(by=["Ranking"], ascending=True)
         self.df["Ubicación1"] = self.df["Ubicación"]
         self.df["Ubicación"] = self.df["Ubicación"].apply(_anadir_ciudad)
         self.df = self.df.loc[~pd.isna(self.df["Ubicación"]), :].copy()
